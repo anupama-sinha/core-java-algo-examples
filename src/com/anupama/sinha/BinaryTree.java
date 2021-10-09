@@ -1,5 +1,7 @@
 package com.anupama.sinha;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 
 //Node
@@ -34,6 +36,9 @@ public class BinaryTree {
             System.out.println("2. Add a Node");
             System.out.println("3. Show DFS Inorder Traversal");
             System.out.println("4. Check if Node Exists");
+            System.out.println("5. Delete a Node");
+            System.out.println("6. Show DFS Preorder Traversal");
+            System.out.println("7. Show DFS Postorder Traversal");
             System.out.println("-1. Terminate");
             System.out.println("Enter option[N] => ");
 
@@ -63,7 +68,17 @@ public class BinaryTree {
                 case 5:
                     System.out.println("Enter Node's Key to delete[N] => ");
                     item = sc.nextInt();
-                    System.out.println("Deletion Logic yet to be implemented...");
+                    tree.root = deleteRecursive(tree.root,item);
+                    System.out.println("Node deleted");
+                    break;
+                case 6 :
+                    showDfsPreorderTraversal(tree.root);
+                    break;
+                case 7 :
+                    showDfsPostorderTraversal(tree.root);
+                    break;
+                case 8 :
+                    showBfsTraversal(tree.root);
                     break;
                 case -1 :
                     System.out.println("Terminating...");
@@ -74,6 +89,60 @@ public class BinaryTree {
             }
         }
 
+    }
+
+    private static void showBfsTraversal(Node root) {
+        if (root == null) {
+            return;
+        }
+
+        Queue<Node> nodes = new LinkedList<>();
+        nodes.add(root);
+
+        while (!nodes.isEmpty()) {
+
+            Node node = nodes.remove();
+
+            System.out.print(" " + node.key);
+
+            if (node.left != null) {
+                nodes.add(node.left);
+            }
+
+            if (node.right != null) {
+                nodes.add(node.right);
+            }
+        }
+    }
+
+    private static Node deleteRecursive(Node current, int item) {
+        if(current == null)
+            return null;
+        if(item == current.key){
+            //Delete & regenerate tree
+            if(current.left == null && current.right == null)
+                return null;
+            if(current.right == null)
+                return current.left;
+            if(current.left == null)
+                return current.right;
+            //If 2 children
+            int smallestValue = findSmallestValue(current.right);
+            current.key = smallestValue;
+            current.right = deleteRecursive(current.right, smallestValue);
+            return current;
+        }
+        if(item < current.key){
+            current.left = deleteRecursive(current.left,item);
+            return current;
+        }
+        current.right = deleteRecursive(current.right,item);
+        return current;
+
+    }
+
+    private static int findSmallestValue(Node root) {
+        return root.left == null ? root.key : findSmallestValue(root.left);
     }
 
     private static boolean containsNodeRecursive(Node current, int item) {
@@ -96,11 +165,27 @@ public class BinaryTree {
         }
     }
 
+    private static void showDfsPreorderTraversal(Node root) {
+        if(root != null){
+            System.out.print(" " + root.key);
+            showDfsInorderTraversal(root.left);
+            showDfsInorderTraversal(root.right);
+        }
+    }
+
+    private static void showDfsPostorderTraversal(Node root) {
+        if(root != null){
+            showDfsInorderTraversal(root.left);
+            showDfsInorderTraversal(root.right);
+            System.out.print(" " + root.key);
+        }
+    }
+
     private static BinaryTree createSimpleBinaryTree(BinaryTree tree) {
-        tree.root = new Node(1);
+        tree.root = new Node(3);
         tree.root.left = new Node(2);
-        tree.root.right = new Node(3);
-        tree.root.left.left = new Node(4);
+        tree.root.right = new Node(4);
+        tree.root.left.left = new Node(1);
         System.out.println("Simple Binary Tree Created!");
         return tree;
     }
